@@ -3,247 +3,87 @@ package com.reactnativevietnam;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.support.annotation.Nullable;
-import android.net.Uri;
-import android.provider.Settings;
-
-import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.bridge.ReactContextBaseJavaModule;
-import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.modules.core.DeviceEventManagerModule;
-import com.facebook.react.bridge.Callback;
-
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.telephony.TelephonyManager;
 
 /**
  * @author Anh Tuan Nguyen
  * @created 8/8/2018
  */
-public class RNNetworkModule extends ReactContextBaseJavaModule {
-    private ReactApplicationContext mReactContext = null;
+public class NetworkReceiver extends BroadcastReceiver {
 
-    public RNNetworkModule(ReactApplicationContext reactContext) {
-        super(reactContext);
-        mReactContext = reactContext;
-        IntentFilter intentFilter = new IntentFilter("RNNetworkState");
-        if (mReactContext != null) {
-            mReactContext.registerReceiver(new BroadcastReceiver() {
-                @Override
-                public void onReceive(Context context, Intent intent) {
-                    Boolean v = intent.getBooleanExtra("isConnected", false);
-                    String type = intent.getStringExtra("type");
-                    Boolean isFast = intent.getBooleanExtra("isFast", true);
-                    WritableMap params = Arguments.createMap();
-                    params.putBoolean("isConnected", v.booleanValue());
-                    params.putString("type", type);
-                    params.putBoolean("isFast", isFast);
-
-                    sendEvent("networkChanged", params);
-                }
-            }, intentFilter);
+    private static boolean isConnectionFast(int type, int subType) {
+        if (type == ConnectivityManager.TYPE_WIFI) {
+            return true;
+        } else if (type == ConnectivityManager.TYPE_MOBILE) {
+            switch (subType) {
+                case TelephonyManager.NETWORK_TYPE_1xRTT:
+                    return false; // ~ 50-100 kbps
+                case TelephonyManager.NETWORK_TYPE_CDMA:
+                    return false; // ~ 14-64 kbps
+                case TelephonyManager.NETWORK_TYPE_EDGE:
+                    return false; // ~ 50-100 kbps
+                case TelephonyManager.NETWORK_TYPE_EVDO_0:
+                    return true; // ~ 400-1000 kbps
+                case TelephonyManager.NETWORK_TYPE_EVDO_A:
+                    return true; // ~ 600-1400 kbps
+                case TelephonyManager.NETWORK_TYPE_GPRS:
+                    return false; // ~ 100 kbps
+                case TelephonyManager.NETWORK_TYPE_HSDPA:
+                    return true; // ~ 2-14 Mbps
+                case TelephonyManager.NETWORK_TYPE_HSPA:
+                    return true; // ~ 700-1700 kbps
+                case TelephonyManager.NETWORK_TYPE_HSUPA:
+                    return true; // ~ 1-23 Mbps
+                case TelephonyManager.NETWORK_TYPE_UMTS:
+                    return true; // ~ 400-7000 kbps
+                /*
+                 * Above API level 7, make sure to set android:targetSdkVersion
+                 * to appropriate level to use these
+                 */
+                case TelephonyManager.NETWORK_TYPE_EHRPD: // API level 11
+                    return true; // ~ 1-2 Mbps
+                case TelephonyManager.NETWORK_TYPE_EVDO_B: // API level 9
+                    return true; // ~ 5 Mbps
+                case TelephonyManager.NETWORK_TYPE_HSPAP: // API level 13
+                    return true; // ~ 10-20 Mbps
+                case TelephonyManager.NETWORK_TYPE_IDEN: // API level 8
+                    return false; // ~25 kbps
+                case TelephonyManager.NETWORK_TYPE_LTE: // API level 11
+                    return true; // ~ 10+ Mbps
+                // Unknown
+                case TelephonyManager.NETWORK_TYPE_UNKNOWN:
+                default:
+                    return false;
+            }
+        } else {
+            return false;
         }
     }
 
     @Override
-    public String getName() {
-        return "RNNetworkState";
-    }
-
-    //    @ReactMethod
-//    public void openGeneral() {
-//        Intent intent = new Intent(Settings.ACTION_SETTINGS);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-//        if (intent.resolveActivity(mReactContext.getPackageManager()) != null) {
-//            mReactContext.startActivity(intent);
-//        }
-//    }
-//
-//    @ReactMethod
-//    public void openAppDetails() {
-//        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-//        intent.setData(Uri.parse("package:" + mReactContext.getPackageName()));
-//        if (intent.resolveActivity(mReactContext.getPackageManager()) != null) {
-//            mReactContext.startActivity(intent);
-//        }
-//    }
-//
-//    @ReactMethod
-//    public void openWifi() {
-//        Intent intent = new Intent(Settings.ACTION_WIFI_SETTINGS);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-//        if (intent.resolveActivity(mReactContext.getPackageManager()) != null) {
-//            mReactContext.startActivity(intent);
-//        }
-//    }
-//
-//    @ReactMethod
-//    public void openLocationSource() {
-//        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-//        if (intent.resolveActivity(mReactContext.getPackageManager()) != null) {
-//            mReactContext.startActivity(intent);
-//        }
-//    }
-//
-//    @ReactMethod
-//    public void openWireless() {
-//        Intent intent = new Intent(Settings.ACTION_WIRELESS_SETTINGS);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-//        if (intent.resolveActivity(mReactContext.getPackageManager()) != null) {
-//            mReactContext.startActivity(intent);
-//        }
-//    }
-//
-//    @ReactMethod
-//    public void openAirplaneMode() {
-//        Intent intent = new Intent(Settings.ACTION_AIRPLANE_MODE_SETTINGS);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-//        if (intent.resolveActivity(mReactContext.getPackageManager()) != null) {
-//            mReactContext.startActivity(intent);
-//        }
-//    }
-//
-//    @ReactMethod
-//    public void openApn() {
-//        Intent intent = new Intent(Settings.ACTION_APN_SETTINGS);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-//        if (intent.resolveActivity(mReactContext.getPackageManager()) != null) {
-//            mReactContext.startActivity(intent);
-//        }
-//    }
-//
-//    @ReactMethod
-//    public void openBluetooth() {
-//        Intent intent = new Intent(Settings.ACTION_BLUETOOTH_SETTINGS);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-//        if (intent.resolveActivity(mReactContext.getPackageManager()) != null) {
-//            mReactContext.startActivity(intent);
-//        }
-//    }
-//
-//    @ReactMethod
-//    public void openDate() {
-//        Intent intent = new Intent(Settings.ACTION_DATE_SETTINGS);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-//        if (intent.resolveActivity(mReactContext.getPackageManager()) != null) {
-//            mReactContext.startActivity(intent);
-//        }
-//    }
-//
-//    @ReactMethod
-//    public void openLocale() {
-//        Intent intent = new Intent(Settings.ACTION_LOCALE_SETTINGS);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-//        if (intent.resolveActivity(mReactContext.getPackageManager()) != null) {
-//            mReactContext.startActivity(intent);
-//        }
-//    }
-//
-//    @ReactMethod
-//    public void openInputMethod() {
-//        Intent intent = new Intent(Settings.ACTION_INPUT_METHOD_SETTINGS);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-//        if (intent.resolveActivity(mReactContext.getPackageManager()) != null) {
-//            mReactContext.startActivity(intent);
-//        }
-//    }
-//
-//    @ReactMethod
-//    public void openDisplay() {
-//        Intent intent = new Intent(Settings.ACTION_DISPLAY_SETTINGS);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-//        if (intent.resolveActivity(mReactContext.getPackageManager()) != null) {
-//            mReactContext.startActivity(intent);
-//        }
-//    }
-//
-//    @ReactMethod
-//    public void openPrivacy() {
-//        Intent intent = new Intent(Settings.ACTION_SECURITY_SETTINGS);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-//        if (intent.resolveActivity(mReactContext.getPackageManager()) != null) {
-//            mReactContext.startActivity(intent);
-//        }
-//    }
-//
-//    @ReactMethod
-//    public void openInternalStorage() {
-//        Intent intent = new Intent(Settings.ACTION_INTERNAL_STORAGE_SETTINGS);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-//        if (intent.resolveActivity(mReactContext.getPackageManager()) != null) {
-//            mReactContext.startActivity(intent);
-//        }
-//    }
-//
-//    @ReactMethod
-//    public void openMemoryCard() {
-//        Intent intent = new Intent(Settings.ACTION_MEMORY_CARD_SETTINGS);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-//        if (intent.resolveActivity(mReactContext.getPackageManager()) != null) {
-//            mReactContext.startActivity(intent);
-//        }
-//    }
-//
-//    @ReactMethod
-//    public void openAccessibility() {
-//        Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-//        if (intent.resolveActivity(mReactContext.getPackageManager()) != null) {
-//            mReactContext.startActivity(intent);
-//        }
-//    }
-//
-//    @ReactMethod
-//    public void openApplication() {
-//        Intent intent = new Intent(Settings.ACTION_APPLICATION_SETTINGS);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-//        if (intent.resolveActivity(mReactContext.getPackageManager()) != null) {
-//            mReactContext.startActivity(intent);
-//        }
-//    }
-//
-//    @ReactMethod
-//    public void openDeviceInfo() {
-//        Intent intent = new Intent(Settings.ACTION_DEVICE_INFO_SETTINGS);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-//        if (intent.resolveActivity(mReactContext.getPackageManager()) != null) {
-//            mReactContext.startActivity(intent);
-//        }
-//    }
-    @ReactMethod
-    public void checkNetworkState(Callback cb) {
-        boolean isConnected = new NetworkReceiver().checkConnect(mReactContext);
-        if(isConnected){
-            cb.invoke("connected");
-        }else  {
-            cb.invoke("notConnect");
+    public void onReceive(Context context, Intent intent) {
+        ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = manager.getActiveNetworkInfo();
+        Intent i = new Intent("RNNetworkState");
+        if (netInfo != null && netInfo.isConnected() && netInfo.isAvailable()) {
+            Boolean isFast = NetworkReceiver.isConnectionFast(netInfo.getType(), netInfo.getSubtype());
+            i.putExtra("isConnected", true);
+            i.putExtra("type", netInfo.getTypeName());
+            i.putExtra("isFast", isFast);
+            context.sendBroadcast(i);
+        } else {
+            i.putExtra("isConnected", false);
+            i.putExtra("type", "unknown");
+            i.putExtra("isFast", false);
+            context.sendBroadcast(i);
         }
     }
-
-    private void sendEvent(String eventName, @Nullable WritableMap params) {
-        if (mReactContext != null) {
-            mReactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(eventName, params);
-        }
+    public boolean checkConnect(Context context){
+         ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo netInfo = manager.getActiveNetworkInfo();
+            return netInfo.isConnected();
     }
+
 }

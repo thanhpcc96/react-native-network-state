@@ -42,13 +42,12 @@ type nameConstant = {
 }
 
 export const Settings = NativeModules.RNNetworkState;
+export function checkConnect(callback: String => void) {
+  Settings.checkNetworkState((cbNative: 'connected' | 'notConnect') => {
+    callback(cbNative);
+  });
+}
 const RNNetworkStateEventEmitter = new NativeEventEmitter(Settings);
-
-// export function checkConnect(cb) {
-//   Settings.checkNetworkState((cbNative: nameConstant) => {
-//     cb(cbNative);
-//   });
-// }
 
 export default class NetworkState extends React.PureComponent < Props > {
   static defaultProps = {
@@ -90,7 +89,7 @@ export default class NetworkState extends React.PureComponent < Props > {
     );
   }
 
-  checkConnect(cb) {
+  static checkConnect(cb) {
     Settings.checkNetworkState((cbNative: nameConstant) => {
       cb(cbNative);
     });
@@ -111,7 +110,7 @@ export default class NetworkState extends React.PureComponent < Props > {
       ...viewProps
     } = this.props;
 
-    if (this.state.visible && this.state.isConnected) {
+    if (this.props.visible && this.state.isConnected) {
       this._TIMEOUT && clearTimeout(this._TIMEOUT);
       this._TIMEOUT = setTimeout(() => {
         this.setState({
@@ -120,25 +119,23 @@ export default class NetworkState extends React.PureComponent < Props > {
       }, debound);
     }
     if (this.state.hidden || !visible) {
-      return <View />;
+      return <View / > ;
     }
-    return (<View
-      style={
+    return ( < View style = {
         styles.container
-      } {...viewProps
-      }
-    >
-      <Text style={
+      } { ...viewProps
+      } >
+      <
+      Text style = {
         [
           this.state.isConnected ? styles.txtSuccess : styles.txtError,
           this.state.isConnected && styleConnected && styleConnected,
           !this.state.isConnected && styleDisconnected && styleDisconnected
         ]
-      }
-      > {
-          this.state.isConnected ?
-            txtConnected || 'Connected' : txtDisconnected || 'No Internet Connection'
-        } </Text> </View >
+      } > {
+        this.state.isConnected ?
+        txtConnected || 'Connected' : txtDisconnected || 'No Internet Connection'
+      } < /Text> </View >
     );
   }
 }

@@ -4180,8 +4180,8 @@ react-is@^16.3.1:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.4.2.tgz#84891b56c2b6d9efdee577cc83501dfc5ecead88"
 
 "react-native-network-state@https://github.com/thanhpcc96/react-native-network-state.git":
-  version "1.0.5"
-  resolved "https://github.com/thanhpcc96/react-native-network-state.git#cc626774cebb822b68036a658712f7c6470d09ff"
+  version "1.0.6"
+  resolved "https://github.com/thanhpcc96/react-native-network-state.git#7e29f85f13caa8b0b5749af424280cf4534a9fbc"
 
 react-native@0.55.4:
   version "0.55.4"

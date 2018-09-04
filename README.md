@@ -14,11 +14,11 @@
 
 ## Getting started
 
-`$ npm install react-native-network-state --save`
+`$ npm install https://github.com/thanhpcc96/react-native-network-state.git --save`
 
 or
 
-`$ yarn add react-native-network-state`
+`$ yarn add https://github.com/thanhpcc96/react-native-network-state.git`
 
 ### Automatic installation
 
@@ -122,8 +122,45 @@ type Props = {
   ...ViewProperties
 }
 ```
+## Method
+```javascript
+  checkConnect: "connected" | "notConnect" => void,
+//Example
+ import NetworkState from "react-native-network-state"
+ ...
+ componentDidMount(){
+    NetworkState.checkConnect(status => {
+    if (status === 'connected') {
+    alert('co ket noi');
+    }
+    if (status === 'notConnect') {
+    alert('ko co ket noi');
+    }
+});
+ }
 
-## Settings Utils
+```
+
+## function helper
+```javascript
+    checkConnect(callback)
+    //Example
+ import { checkConnect } from "react-native-network-state"
+ ...
+ componentDidMount(){
+    checkConnect(status => {
+    if (status === 'connected') {
+    alert('co ket noi');
+    }
+    if (status === 'notConnect') {
+    alert('ko co ket noi');
+    }
+});
+ }
+
+```
+
+## Settings Utils -- REMOVED because apple's policies
 
 | Functions           | iOS | Android |
 | ------------------- | :-: | :-----: |
