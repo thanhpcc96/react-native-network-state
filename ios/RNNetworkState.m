@@ -1,9 +1,9 @@
 
-#import "NetworkState.h"
+#import "RNNetworkState.h"
 #import "Reachability.h"
 #import <React/RCTConvert.h>
 
-@implementation NetworkState {
+@implementation RNNetworkState {
   Reachability* reach;
   BOOL hasListener;
   NetworkStatus prevStatus;
