@@ -1,6 +1,6 @@
-//@flow
+// @flow
 
-import React from "react"
+import React from 'react';
 import {
   View,
   Text,
@@ -11,17 +11,17 @@ import {
   NativeModules,
   NativeEventEmitter,
   Platform
-} from "react-native"
+} from 'react-native';
 
 type Props = {
-  visible?: boolean,
-  debound?: number,
-  txtConnected?: string,
-  txtDisconnected?: string,
-  styleConnected?: Object | Number,
-  styleDisconnected?: Object | Number,
-  onConnected?: Function,
-  onDisconnected?: Function,
+  visible ? : boolean,
+  debound ? : number,
+  txtConnected ? : string,
+  txtDisconnected ? : string,
+  styleConnected ? : Object | Number,
+  styleDisconnected ? : Object | Number,
+  onConnected ? : Function,
+  onDisconnected ? : Function,
   ...ViewProperties
 }
 
@@ -37,15 +37,25 @@ type NetworkData = {
   isFast: boolean
 }
 
-export const Settings = NativeModules.RNNetworkState
-const RNNetworkStateEventEmitter = new NativeEventEmitter(Settings)
+type nameConstant = {
+  name: 'connected' | 'notConnect';
+}
 
-export default class NetworkState extends React.PureComponent<Props> {
+export const Settings = NativeModules.RNNetworkState;
+const RNNetworkStateEventEmitter = new NativeEventEmitter(Settings);
+
+export function checkConnect(cb) {
+  Settings.checkNetworkState((cbNative: nameConstant) => {
+    cb(cbNative);
+  });
+}
+
+export default class NetworkState extends React.PureComponent < Props > {
   static defaultProps = {
     visible: true,
     debound: 1500,
-    txtConnected: "Connected",
-    txtDisconnected: "No Internet Connection",
+    txtConnected: 'Connected',
+    txtDisconnected: 'No Internet Connection',
     onConnected: () => {},
     onDisconnected: () => {}
   }
@@ -53,7 +63,7 @@ export default class NetworkState extends React.PureComponent<Props> {
   state: State = {
     hidden: true,
     isConnected: true,
-    type: "unknown",
+    type: 'unknown',
     isFast: true
   }
 
@@ -61,22 +71,27 @@ export default class NetworkState extends React.PureComponent<Props> {
   _listener: any = null
 
   constructor(props: Props) {
-    super(props)
+    super(props);
 
-    const { onConnected, onDisconnected } = this.props
+    const {
+      onConnected,
+      onDisconnected
+    } = this.props;
     this._listener = RNNetworkStateEventEmitter.addListener(
-      "networkChanged",
+      'networkChanged',
       (data: NetworkData) => {
         if (this.state.isConnected !== data.isConnected) {
-          data.isConnected ? onConnected(data) : onDisconnected(data)
-          this.setState({ ...data, hidden: false })
+          data.isConnected ? onConnected(data) : onDisconnected(data);
+          this.setState({ ...data,
+            hidden: false
+          });
         }
       }
-    )
+    );
   }
 
   componentWillUnmount() {
-    this._listener.remove()
+    this._listener.remove();
   }
 
   render() {
@@ -88,38 +103,43 @@ export default class NetworkState extends React.PureComponent<Props> {
       debound,
       visible,
       ...viewProps
-    } = this.props
+    } = this.props;
 
     if (this.state.visible && this.state.isConnected) {
-      this._TIMEOUT && clearTimeout(this._TIMEOUT)
+      this._TIMEOUT && clearTimeout(this._TIMEOUT);
       this._TIMEOUT = setTimeout(() => {
-        this.setState({ hidden: true })
-      }, debound)
+        this.setState({
+          hidden: true
+        });
+      }, debound);
     }
     if (this.state.hidden || !visible) {
-      return <View />
+      return <View />;
     }
-    return (
-      <View style={styles.container} {...viewProps}>
-        <Text
-          style={[
-            this.state.isConnected ? styles.txtSuccess : styles.txtError,
-            this.state.isConnected && styleConnected && styleConnected,
-            !this.state.isConnected && styleDisconnected && styleDisconnected
-          ]}
-        >
-          {this.state.isConnected
-            ? txtConnected || "Connected"
-            : txtDisconnected || "No Internet Connection"}
-        </Text>
-      </View>
-    )
+    return (<View
+style={
+      styles.container
+    } {...viewProps
+    }
+    >
+      <Text style={
+        [
+          this.state.isConnected ? styles.txtSuccess : styles.txtError,
+          this.state.isConnected && styleConnected && styleConnected,
+          !this.state.isConnected && styleDisconnected && styleDisconnected
+        ]
+      }
+      > {
+          this.state.isConnected ?
+            txtConnected || 'Connected' : txtDisconnected || 'No Internet Connection'
+        } </Text> </View >
+    );
   }
 }
 
 const styles = StyleSheet.create({
   container: {
-    position: "absolute",
+    position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
@@ -131,14 +151,14 @@ const styles = StyleSheet.create({
   },
   txtSuccess: {
     paddingVertical: 5,
-    color: "#fff",
-    backgroundColor: "#4caf50",
-    textAlign: "center"
+    color: '#fff',
+    backgroundColor: '#4caf50',
+    textAlign: 'center'
   },
   txtError: {
     paddingVertical: 5,
-    color: "#fff",
-    backgroundColor: "#f44336",
-    textAlign: "center"
+    color: '#fff',
+    backgroundColor: '#f44336',
+    textAlign: 'center'
   }
-})
+});
