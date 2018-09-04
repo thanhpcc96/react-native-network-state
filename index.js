@@ -44,11 +44,11 @@ type nameConstant = {
 export const Settings = NativeModules.RNNetworkState;
 const RNNetworkStateEventEmitter = new NativeEventEmitter(Settings);
 
-export function checkConnect(cb) {
-  Settings.checkNetworkState((cbNative: nameConstant) => {
-    cb(cbNative);
-  });
-}
+// export function checkConnect(cb) {
+//   Settings.checkNetworkState((cbNative: nameConstant) => {
+//     cb(cbNative);
+//   });
+// }
 
 export default class NetworkState extends React.PureComponent < Props > {
   static defaultProps = {
@@ -90,6 +90,12 @@ export default class NetworkState extends React.PureComponent < Props > {
     );
   }
 
+  checkConnect(cb) {
+    Settings.checkNetworkState((cbNative: nameConstant) => {
+      cb(cbNative);
+    });
+  }
+
   componentWillUnmount() {
     this._listener.remove();
   }
@@ -117,10 +123,10 @@ export default class NetworkState extends React.PureComponent < Props > {
       return <View />;
     }
     return (<View
-style={
-      styles.container
-    } {...viewProps
-    }
+      style={
+        styles.container
+      } {...viewProps
+      }
     >
       <Text style={
         [
